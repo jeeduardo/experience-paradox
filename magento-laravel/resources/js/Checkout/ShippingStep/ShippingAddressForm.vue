@@ -108,8 +108,7 @@
     </div>
 
     <div className="row">
-      <h2>same as billing {{ shippingAddressFormData.same_as_billing }}</h2>
-      <input type="checkbox" name="same_as_billing" id="same-as-billing" v-model="shippingAddressFormData.same_as_billing" style="display: block;" />
+      <input type="checkbox" name="same_as_billing" id="same-as-billing" v-model="shippingAddressFormData.same_as_billing" className="hidden" />
       <label htmlFor="same-as-billing"
              className="same-as-billing-label">
         <div className="same-as-billing-box">
