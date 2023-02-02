@@ -3,6 +3,7 @@
 namespace App\Services\Api;
 
 
+use App\Models\CategoryProduct;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 
@@ -12,6 +13,14 @@ class ProductService
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
+
+    /**
+     * Array of products we got from magento to be used
+     * for saving/update later to category_products
+     * keyed by the magento_product_id
+     * @var array
+     */
+    private $magentoProducts;
 
     /**
      * ProductService constructor.
@@ -49,6 +58,12 @@ class ProductService
                 $this->logger->info("Product with SKU ".$product->sku." $action...");
             }
         }
+
+        if (!empty($this->magentoProducts)) {
+            echo "Syncing category-product mapping to category_products...\n";
+            CategoryProduct::mapCategoryAndProducts($this->magentoProducts);
+            return true;
+        }
         return false;
     }
 
@@ -76,9 +91,23 @@ class ProductService
                 }
             }
 
+            // Init product to magentProducts array
+            $m2ProductId = $product->magento_product_id;
+            if (empty($this->magentoProducts[$m2ProductId])) {
+                $this->magentoProducts[$m2ProductId] = [
+                    'product_id' => $product->id,
+                    'magento_product_id' => $product->magento_product_id,
+                ];
+            }
             if ($indexInCustomAttributes != -1) {
                 if ($column == 'category_ids') {
+                    // echo "INDEX OF category_ids = ".$indexInCustomAttributes."\n";
+                    // @todo: store this value under $this->products[$magentoProductId] array later...
+                    // echo implode(',', $customAttributes[$indexInCustomAttributes]['value']);
+                    // echo "\n";
                     $categoryIdsColumnIndex = $indexInCustomAttributes;
+                    $this->magentoProducts[$m2ProductId]['category_ids']
+                        = $customAttributes[$indexInCustomAttributes]['value'];
                 } elseif($column == 'special_price') {
                     $this->logger->info('Special price found for '.$product->sku.' :: ');
                     $this->logger->info($customAttributes[$indexInCustomAttributes]['value']);

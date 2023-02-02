@@ -3,7 +3,7 @@
     <div className="arrow-1"></div>
     <div className="arrow-2"></div>
   </div>
-  <a v-bind:href="menu.url_path" className="has-child">{{ menu.name }}</a>
+  <a v-bind:href="getUrlPath(menu.url_path)" className="has-child">{{ menu.name }}</a>
   <Submenu v-if="hasChildren(menu)" :menu="menu" :submenus="menu.children"/>
 </template>
 <script>
@@ -26,6 +26,9 @@
           return true;
         }
         return false;
+      },
+      getUrlPath(urlPath) {
+        return '/catalog/' + urlPath;
       }
     }
   }</script>

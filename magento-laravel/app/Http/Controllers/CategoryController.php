@@ -14,10 +14,10 @@ class CategoryController extends Controller
 {
     public function view($urlPath, Request $request)
     {
+        // @todo: $urlPath is a category_id as of now , 02-02-2023
         // @todo: we will find by url_path eventually
-        $category = Category::findOrFail($urlPath);
-        $visibility = 4;
-        $products = Product::where('visibility', $visibility)->get()->all();
+        $category = Category::getByUrlPath($urlPath);
+        $products = Product::getProductsByCategory($category->id);
 
         $categoryMenus = Category::getCategoryMenuTree();
 

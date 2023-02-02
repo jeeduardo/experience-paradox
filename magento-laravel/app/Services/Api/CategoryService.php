@@ -112,11 +112,20 @@ class CategoryService
                 foreach ($item['custom_attributes'] as $customAttribute) {
                     $customAttributeJson[$customAttribute['attribute_code']] = $customAttribute['value'];
                     // @todo: process later
-//                     if ($customAttribute['attribute_code'] == 'url_path') {
-//                        $category->url_path = $customAttribute['value'];
-//                    }
+                     if ($customAttribute['attribute_code'] == 'url_path') {
+                        $category->url_path = $customAttribute['value'];
+                    }
                 }
                 $category->custom_attributes = $customAttributeJson;
+
+                // @todo: DEBUG!!!
+                if ($category->magento_category_id == 13) {
+                    dd([
+                        $customAttributeJson,
+                        $category->toArray(),
+                    ]);
+                }
+
                 $category->save();
                 echo "Category {$category->name} ({$category->id}) updated. \n";
             }

@@ -21,6 +21,18 @@ class Product extends Model
         'media_gallery_entries'
     ];
 
+    public static function getProductsByCategory($categoryId)
+    {
+        $visibility = 4;
+        $products = Product::where('visibility', $visibility)
+            ->where('category_products.category_id', $categoryId)
+            ->join('category_products', 'products.id', 'category_products.product_id')
+            ->get()
+            ->all();
+
+        return $products;
+    }
+
     /**
      * @return array
      */

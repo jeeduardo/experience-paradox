@@ -82,6 +82,7 @@ class SyncProducts extends Command
                 'searchCriteria[pageSize]' => $pageSize,
                 'searchCriteria[currentPage]' => $currentPage
             ]);
+            // @todo: IF NO PRODUCTS - break the loop
             $jsonResponse = $response->json();
             if (!empty($jsonResponse)) {
                 $jsonResponses[$currentPage] = $jsonResponse;

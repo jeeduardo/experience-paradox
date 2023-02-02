@@ -17,10 +17,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/catalog/{id}', [
+Route::get('/catalog/{urlPath?}', [
     \App\Http\Controllers\CategoryController::class,
     'view'
-]);
+])->where('urlPath', '(.*)');
 
 Route::get('/carts/{cartId}', [
     \App\Http\Controllers\CartController::class,

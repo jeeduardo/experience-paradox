@@ -177,6 +177,8 @@
             axios.delete(url).then(response => {
               // Under construction
             });
+          } else {
+            this.ajaxInProgress = false;
           }
         } else {
           axios.delete(url).then(response => {

@@ -1,7 +1,7 @@
 <template>
   <ul :class="shouldShowSubmenu() ? 'menu menu-level-2 menu-display': 'menu menu-level-2'">
     <li v-for="(submenu, index) in submenus" className="menu-item" :key="index">
-      <a v-bind:href="submenu.url_path">{{ submenu.name }}</a>
+      <a v-bind:href="getUrlPath(submenu.url_path)">{{ submenu.name }}</a>
     </li>
   </ul>
 </template>
@@ -21,6 +21,9 @@
     methods: {
       shouldShowSubmenu() {
         return (this.menu.showSubmenu != undefined) && this.menu.showSubmenu;
+      },
+      getUrlPath(urlPath) {
+        return '/catalog/' + urlPath;
       }
     }
   }

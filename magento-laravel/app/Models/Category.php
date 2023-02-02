@@ -23,6 +23,25 @@ class Category extends Model
         'custom_attributes'
     ];
 
+    public static function getByUrlPath($urlPath)
+    {
+        // @todo: change to "WHERE url_path = <url_path>" later...
+        $category = self::where('url_path', $urlPath)->first();
+        return $category;
+    }
+
+    public static function getCategoriesByMagentoCategoryId()
+    {
+        $rows = self::all();
+        $categories = [];
+        foreach ($rows as $category) {
+            $categories[$category->magento_category_id] = [
+                'category_id' => $category->id
+            ];
+        }
+        return $categories;
+    }
+
     public static function getCategoriesByLevel($level)
     {
         $rows = self::where('level', $level)->get()->all();
