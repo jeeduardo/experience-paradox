@@ -9,7 +9,7 @@ magento-laravel - a pet project I'm working (when the youngest is not crying) wh
 1. Laravel and VueJS 
 2. Verifying if it's possible to still use the Magento backend and get a faster speed from it. (Because using a customized Magento frontend could be slow unless you have the Infra for it.)
 
-Note: It is still a work in progress. 
+*Note: It is still a work in progress.
 
 ratesdotca - a test that I took on for an application previously. 
 
