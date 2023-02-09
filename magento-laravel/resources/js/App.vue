@@ -100,7 +100,7 @@
         setStepToShow: (stepToShow) => {
           console.log('App.vue :: setStepToShow...', stepToShow, this.showFlags[stepToShow]);
           this.stepToShow = stepToShow
-          // @todo: my technique for automatically showing Shipping address > Billing address > Shipping Address > Payment method
+          // Hide all steps, show specific step later...
           let showFlagSteps = Object.keys(this.showFlags);
           showFlagSteps.forEach((key, index) => {
             this.showFlags[key] = false;

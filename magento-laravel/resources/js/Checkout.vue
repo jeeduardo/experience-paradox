@@ -89,14 +89,6 @@ export default {
     // Method to show content of cart summary/shipping address/billing address/shipping method/payment step
     // Triggered when showContent custom event is emitted by any of the steps above (CartSummaryStep, ShippingStep, etc..)
     showStepContent(param) {
-      console.log('Checkout.vue :: showStepContent', param.stepId, param.showFlag, this.stepIds[param.stepId]);
-      // @todo: my technique for automatically showing Shipping address > Billing address > Shipping Address > Payment method
-      // let showFlagSteps = Object.keys(this.showFlags);
-      // showFlagSteps.forEach((key, index) => {
-      //   this.showFlags[key] = false;
-      // });
-
-      // this.showFlags[param.stepId] = !param.showFlag;
       this.setShowFlagForStep(param.stepId, !param.showFlag);
       param.arrowClicked = !param.arrowClicked;
     },
