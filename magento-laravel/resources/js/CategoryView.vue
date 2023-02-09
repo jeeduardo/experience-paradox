@@ -96,18 +96,12 @@
           this.initCart(product).then(response => {
             if (response != false) {
               quote_id = response;
+              const { sku, id, name, price } = product;
+              const qty = 1;
               if (quote_id) {
                 let addToCartPayload = {
-                  cartItem: {
-                    quote_id,
-                    sku: product.sku,
-                    qty: 1
-                  },
-                  product: {
-                    id: product.id,
-                    name: product.name,
-                    price: product.price
-                  }
+                  cartItem: { quote_id, sku, qty},
+                  product: { id, name, price }
                 };
                 this.addToCartAjax(addToCartPayload);
               }

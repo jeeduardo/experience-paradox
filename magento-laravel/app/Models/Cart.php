@@ -45,7 +45,9 @@ class Cart extends Model
         $this->items_qty = $itemsQty;
         $this->items_count = $itemsCount;
         $this->subtotal = $subtotal;
+        $this->base_subtotal = $subtotal;
         $this->grand_total = $subtotal;
+        $this->base_grand_total = $subtotal;
 
         return $this;
     }
@@ -58,7 +60,19 @@ class Cart extends Model
         $this->base_subtotal = $totals['base_subtotal'];
         $this->items_qty = $totals['items_qty'];
         $this->items_count = count($totals['items']);
+        if (!empty($totals['total_segments'])) {
+            $this->total_segments = \json_encode($totals['total_segments']);
+        }
         return $this;
+    }
+
+    public function getTotalSegments()
+    {
+        $totalSegments = \json_decode($this->total_segments, true);
+        if (\json_last_error() == JSON_ERROR_NONE) {
+            return $totalSegments;
+        }
+        return [];
     }
 
     public function cartItems()

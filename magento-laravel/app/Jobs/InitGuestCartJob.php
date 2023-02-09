@@ -40,7 +40,6 @@ class InitGuestCartJob implements ShouldQueue
     ) {
         $this->guestCartService = $guestCartService;
         $this->cart = $cart;
-        $this->logger = Log::channel('cart_sync');
     }
 
     /**
@@ -50,6 +49,7 @@ class InitGuestCartJob implements ShouldQueue
      */
     public function handle()
     {
+        $this->logger = Log::channel('cart_sync');
         // Initialize guest cart, get token
         // Then, update "cart" record with the token
         $cartToken = $this->guestCartService->requestGuestCart();

@@ -114,6 +114,7 @@
       'setAjaxInProgress'
     ],
     data() {
+      console.log('BillingAddressForm.vue :: this.addresses()', this.addresses(), this.addresses().length);
       let billingAddressFormData = {
         firstname: '',
         lastname: '',
@@ -126,13 +127,14 @@
       };
 
       let address = {};
-      if (this.addresses().length > 0) {
-        address = this.addresses()[0];
-        if (address.same_as_billing) {
-          billingAddressFormData = address;
-        } else if (this.addresses().length > 1) {
-          billingAddressFormData = this.addresses()[1];
-        }
+      if (this.addresses().billing) {
+        address = this.addresses().billing;
+        // if (address.same_as_billing) {
+        //   billingAddressFormData = address;
+        // } else if (this.addresses().length > 1) {
+        //   billingAddressFormData = this.addresses()[1];
+        // }
+        billingAddressFormData = this.addresses().billing;
       }
 
       return {
@@ -157,7 +159,7 @@
         let street = [this.billingAddressFormData.street];
         let cart_id = this.cart().id;
 
-        const payload = {
+        let payload = {
           cart_id,
           address: {
             firstname,
@@ -170,11 +172,15 @@
             telephone
           }
         };
+        if (this.billingAddressFormData.id != undefined) {
+          payload.address.id = this.billingAddressFormData.id;
+        }
 
         this.setAjaxInProgress(true);
         axios.post(saveBillingAddressUrl, payload).then(response => {
           if (response.data.checkout_address) {
             // What to do?
+            this.billingAddressFormData.id = response.data.checkout_address.id;
           }
           this.setStepToShow('shipping-method');
           this.arrowClicked = false;

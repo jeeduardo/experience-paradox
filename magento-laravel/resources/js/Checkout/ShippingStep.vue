@@ -1,5 +1,5 @@
 <template>
-  <section id="shipping" className="step">
+  <section :id="stepId" className="step">
     <header className="step-header">
       <h3>Shipping</h3>
       <div className="step-toggle" @click="showContent">
@@ -24,6 +24,8 @@
     emits: ['showContent', 'showBillingAddressStep'],
     props: {
       step: String,
+      stepId: String,
+      showFlag: Boolean
     },
     data() {
       // If false, it will not show the step's content
@@ -57,7 +59,7 @@
     computed: {
       contentClass() {
         let contentClass = 'shipping step-content hidden';
-        if (this.arrowClicked) {
+        if (this.showFlag) {
           contentClass = 'shipping step-content';
         }
         return contentClass;

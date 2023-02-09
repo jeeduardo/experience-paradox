@@ -84,6 +84,16 @@
       </div>
     </div>
 
+
+    <div className="row">
+      <label htmlFor="region_id" className="hidden">State/Province</label>
+      <div className="form-input-container">
+        <select id="region_id" name="region_id" v-model="shippingAddressFormData.region_id" @change="syncWithRegionTextbox">
+          <option value="">-Region-</option>
+          <option v-for="(region, index) in regions()" :value="index">{{ region }}</option>
+        </select>
+      </div>
+    </div>
     <div className="row">
       <label htmlFor="country_id" className="hidden">Country</label>
       <div className="form-input-container">
@@ -135,6 +145,7 @@
   export default {
     inject: [
       'cart',
+      'regions',
       'addresses',
       'setShippingMethods',
       'setStepToShow',
@@ -143,11 +154,12 @@
     ],
     emits: ['afterSaveShippingAddress', 'showBillingAddressStep'],
     data() {
+      console.log('ShippingAddressForm.vue :: this.addresses() ?', this.addresses());
       const cart = this.cart();
       let id = 0;
       let shippingAddress = {};
-      if (this.addresses() != undefined) {
-        shippingAddress = this.addresses()[0];
+      if (this.addresses() != undefined && this.addresses().shipping) {
+        shippingAddress = this.addresses().shipping;
       }
       const {
         email,
@@ -155,6 +167,7 @@
         lastname,
         city,
         region,
+        region_id,
         telephone,
         country_id,
         postcode
@@ -177,6 +190,7 @@
         street,
         city,
         region,
+        region_id,
         postcode,
         country_id,
         telephone,
@@ -189,6 +203,11 @@
       }
     },
     methods: {
+      syncWithRegionTextbox(e) {
+        console.log('syncWithRegionTextbox :: ', e.target, this.shippingAddressFormData.region_id);
+        const region_id = this.shippingAddressFormData.region_id;
+        this.shippingAddressFormData.region = this.regions()[region_id];
+      },
       setSameAsBilling(flag) {
         this.sameAsBilling = flag;
         this.shippingAddressFormData.same_as_billing = this.sameAsBilling;
@@ -206,6 +225,7 @@
         e.preventDefault();
         const {
           region,
+          region_id,
           country_id,
           postcode,
           city,
@@ -226,6 +246,7 @@
           address: {
             id,
             region,
+            region_id,
             country_id,
             street,
             postcode,
@@ -246,6 +267,7 @@
         const axios = window.axios;
         axios.post(shippingMethodsUrl, shippingMethodsPayload).then(response => {
           shippingAddressFormData = response.data.checkout_address;
+          this.shippingAddressFormData = shippingAddressFormData;
 
           var pollShippingMethodsFn = setInterval(() => {
             let addressId = shippingAddressFormData.id;

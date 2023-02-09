@@ -30,6 +30,7 @@ class CheckoutAddress extends Model
         'street',
         'city',
         'region',
+        'region_id',
         'postcode',
         'country_id',
         'telephone',
@@ -86,6 +87,7 @@ class CheckoutAddress extends Model
             'lastname' => $data['address']['lastname'],
             'street' => $data['address']['street'][0],
             'region' => $data['address']['region'],
+//            'region_id' => $data['address']['region_id'],
             'city' => $data['address']['city'],
             'country_id' => $data['address']['country_id'],
             'telephone' => $data['address']['telephone'],
@@ -94,6 +96,11 @@ class CheckoutAddress extends Model
             'prefix' => '',
             'middlename' => '',
         ];
+
+        if (!empty($data['address']['region_id'])) {
+            $addressData['region_id'] = $data['address']['region_id'];
+        }
+
         if (!empty($data['address']['email'])) {
             $addressData['email'] = $data['address']['email'];
         }
@@ -126,6 +133,11 @@ class CheckoutAddress extends Model
         $this->telephone = $data['telephone'];
         $this->postcode = $data['postcode'];
         $this->same_as_billing = $data['same_as_billing'];
+
+        if (!empty($data['region_id'])) {
+            $this->region_id = $data['region_id'];
+        }
+
         $this->save();
         return $this;
     }
@@ -141,6 +153,26 @@ class CheckoutAddress extends Model
         $this->grand_total = $totals['grand_total'];
         $this->base_grand_total = $totals['base_grand_total'];
         return $this;
+    }
+
+    public static function getAddresses($cartId)
+    {
+        $shippingAddress = CheckoutAddress::getShippingAddress($cartId);
+        $billingAddress = false;
+        $addresses = [];
+        if (!empty($shippingAddress)) {
+            $addresses['shipping'] = $shippingAddress;
+            if ($shippingAddress->same_as_billing) {
+                $billingAddress = $shippingAddress;
+            } else {
+                $billingAddress = CheckoutAddress::getBillingAddress($cartId);
+            }
+        }
+        if (!empty($billingAddress)) {
+            $addresses['billing'] = $billingAddress;
+        }
+
+        return $addresses;
     }
 
     public static function getShippingAddress($cartId)

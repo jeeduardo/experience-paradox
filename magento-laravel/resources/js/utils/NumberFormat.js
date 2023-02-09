@@ -4,7 +4,16 @@ const NumberFormat = {
     return (isNaN(number)) ? 0 : parseInt(number)
   },
   formatPrice: (price) => {
-    return (isNaN(price)) ? 0 : parseFloat(price).toFixed(2);
+    if (isNaN(price)) {
+      return 0;
+    }
+
+    price = parseFloat(price);
+    if (price < 0) {
+      price = Math.abs(price);
+    }
+
+    return price.toFixed(2);
   }
 };
 

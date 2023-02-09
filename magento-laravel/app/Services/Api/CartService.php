@@ -108,6 +108,10 @@ class CartService extends ApiService
     {
         $endpoint = '/guest-carts/' . $cartToken . '/estimate-shipping-methods';
         $url = $this->getApiBaseUrl() . $endpoint;
+
+        // "Refine" shippingAddressData
+        $shippingAddressData['address']['same_as_billing'] = (int)$shippingAddressData['address']['same_as_billing'];
+
         $returnData = $this->post($endpoint, $shippingAddressData);
 
         if ($returnData) {

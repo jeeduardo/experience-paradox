@@ -31,23 +31,6 @@ class CheckoutShippingRate extends Model
         $shippingMethodObjects = [];
         foreach ($shippingMethods as $method) {
             $addressId = $checkoutAddressId;
-            /*
-             * +--------------------+---------------------+------+-----+---------+----------------+
-| id                 | bigint(20) unsigned | NO   | PRI | NULL    | auto_increment |
-| address_id         | bigint(20) unsigned | YES  | MUL | NULL    |                |
-| magento_address_id | int(10) unsigned    | YES  |     | NULL    |                |
-| carrier            | varchar(64)         | YES  |     | NULL    |                |
-| carrier_title      | varchar(255)        | YES  |     | NULL    |                |
-| code               | varchar(64)         | YES  |     | NULL    |                |
-| method             | varchar(128)        | YES  |     | NULL    |                |
-| method_description | text                | YES  |     | NULL    |                |
-| price              | decimal(20,4)       | NO   |     | 0.0000  |                |
-| error_message      | text                | YES  |     | NULL    |                |
-| method_title       | text                | YES  |     | NULL    |                |
-| created_at         | timestamp           | YES  |     | NULL    |                |
-| updated_at         | timestamp           | YES  |     | NULL    |                |
-+----------------
-             */
 
             $shippingMethod = self::where('address_id', $addressId)
                                 ->where('method', $method['method_code'])

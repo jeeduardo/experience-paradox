@@ -24,4 +24,33 @@ class BillingController extends Controller
             'message' => 'Please check logs for details.',
         ]);
     }
+
+    public function placeOrder($cartToken, Request $request)
+    {
+        $data = $request->all();
+/*
+{
+    "email": "guest@jesadiya.com",
+    "paymentMethod": {
+        "method": "cashondelivery"
+    },
+    "billing_address": {
+        "email": "rakesh@wearejh.com",
+        "region": "County Kerry",
+        "region_id": 0,
+        "region_code": "",
+        "country_id": "IE",
+        "street": [
+            "123 Dublin street"
+        ],
+        "postcode": "W34 X4Y5",
+        "city": "Dublin",
+        "telephone": "441XXXXX44",
+        "firstname": "Janes Guest",
+        "lastname": "Does Guest"
+    }
+}
+ */
+        // return order ID and its details
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Services\Api;
 
+use Illuminate\Support\Facades\Http;
+
 class ApiService
 {
     /**
@@ -47,5 +49,25 @@ class ApiService
         if (empty($this->getApiBaseUrl()) || empty($this->getToken())) {
             throw new \Exception('ERROR : API URL / token is empty.');
         }
+    }
+
+    /**
+     * Method to fetch GET API responses
+     *
+     * @param $endpoint
+     * @return array|bool
+     */
+    public function get($endpoint)
+    {
+        $response = Http::withToken($this->getToken())->get($this->getApiBaseUrl() . $endpoint);
+
+        if ($response->successful()) {
+            $jsonResponse = $response->json();
+            if (!empty($jsonResponse)) {
+                 return $jsonResponse;
+            }
+        }
+
+        return false;
     }
 }

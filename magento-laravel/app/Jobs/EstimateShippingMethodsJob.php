@@ -70,7 +70,8 @@ class EstimateShippingMethodsJob implements ShouldQueue
         print_r([
             $this->checkoutAddressId,
             $this->cartToken,
-            $this->shippingAddressData
+            $this->shippingAddressData,
+            gettype($this->shippingAddressData['address']['same_as_billing']),
         ]);
         $shippingMethods = $this->cartService
             ->estimateShippingMethods($this->cartToken, $this->shippingAddressData);

@@ -68,7 +68,7 @@
   // Fetch the [data-vars] value from the div with id app (div#app)
   const { vars } = document.getElementById('app').dataset;
   // Parse the variables to JSON then get necessary objects (menus, cart, etc..)
-  const { categoryMenus, cart, errorMessages, addresses, shippingMethods } = JSON.parse(vars);
+  const { categoryMenus, cart, errorMessages, addresses, shippingMethods, regions } = JSON.parse(vars);
 
   export default {
     components: {
@@ -88,18 +88,36 @@
         shouldShowMiniCart: () => this.showMiniCart,
         // function to change "showMiniCart" flag
         setShowMiniCart: (flag) => { this.showMiniCart = flag },
+        stepIds: () => this.stepIds,
+        showFlags: () => this.showFlags,
+        setShowFlagForStep: (step, flag) => {
+          console.log('App.vue :: setShowFlagForStep', step, flag);
+          this.showFlags[step] = flag;
+        },
         // function to return which step to show in checkout
         stepToShow: () => this.stepToShow,
         // function to set which step should be shown in checkout
-        setStepToShow: (stepToShow) => { this.stepToShow = stepToShow },
+        setStepToShow: (stepToShow) => {
+          console.log('App.vue :: setStepToShow...', stepToShow, this.showFlags[stepToShow]);
+          this.stepToShow = stepToShow
+          // @todo: my technique for automatically showing Shipping address > Billing address > Shipping Address > Payment method
+          let showFlagSteps = Object.keys(this.showFlags);
+          showFlagSteps.forEach((key, index) => {
+            this.showFlags[key] = false;
+          });
+          // Show a specific step...
+          this.showFlags[stepToShow] = true;
+        },
         // active cart session object
         cart: () => this.cart,
         // setter function to update cart session object
         setCart: (cart) => { this.cart = cart },
         // set cart items quantity (shown on top right side)
         setCartItemsQty: (itemsQty) => { this.itemsQty = itemsQty },
+        regions: () => this.regions,
         // function to return address/es linked to active cart session used
         addresses: () => this.addresses,
+        // @TODO: TRICKY scenario with billing address depending on same_as_billing flag...
         // function to return the shipping method/s available for given
         shippingMethods: () => this.shippingMethods,
         // function to update available shipping method/s (if shipping address was changed...)
@@ -130,11 +148,33 @@
         itemsQty = cart.items_qty;
       }
       let paymentMethods = [];
+
+
+
+      const stepIds = {
+        'cart-summary': 'cart-summary',
+        'shipping': 'shipping',
+        'billing-address': 'billing-address',
+        'shipping-method': 'shipping-method',
+        'payment-method': 'payment-method'
+      };
+
+      const showFlags = {
+        'cart-summary': false,
+        'shipping': false,
+        'billing-address': false,
+        'shipping-method': false,
+        'payment-method': false,
+      };
+
       return {
         errorMessages,
         ajaxInProgress,
+        stepIds,
+        showFlags,
         stepToShow,
         cart,
+        regions,
         addresses,
         shippingMethods,
         paymentMethods,

@@ -7,6 +7,9 @@
     <div className="cart-info">
       <div className="cart-info-row">
         <strong className="product-name">{{ cartItem.name }}</strong>
+        <div className="price-info">
+          <Price :price="cartItem.row_total" />
+      </div>
       </div>
       <div className="cart-info-row">
         <div className="qty">
@@ -15,9 +18,6 @@
         </div>
       </div>
       <div className="cart-info-row">
-        <div className="price-info">
-          <Price :price="cartItem.row_total" />
-        </div>
       </div>
     </div>
   </div>

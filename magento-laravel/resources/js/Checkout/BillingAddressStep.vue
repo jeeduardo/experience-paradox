@@ -1,5 +1,5 @@
 <template>
-  <section id="billing-address" className="step">
+  <section :id="stepId" className="step">
     <header className="step-header">
       <h3>Billing</h3>
       <div className="step-toggle" @click="showContent">
@@ -27,17 +27,11 @@ export default {
   ],
   props: {
     step: String,
+    stepId: String,
+    showFlag: Boolean
   },
   components: {
     BillingAddressForm
-  },
-  data() {
-    let arrowClicked = false;
-    let stepId = 'billing-address';
-    return {
-      arrowClicked,
-      stepId
-    }
   },
   methods: {
     showContent(e) {
@@ -45,12 +39,12 @@ export default {
     },
     getContentClass() {
       let contentClass = 'billing-address step-content hidden';
-      if (this.stepToShow() == this.stepId) {
-        this.arrowClicked = true;
-        this.setStepToShow('');
-      }
+      // if (this.stepToShow() == this.stepId) {
+      //   this.arrowClicked = true;
+      //   this.setStepToShow('');
+      // }
 
-      if (this.arrowClicked) {
+      if (this.showFlag) {
         contentClass = 'billing-address step-content';
       }
       return contentClass;

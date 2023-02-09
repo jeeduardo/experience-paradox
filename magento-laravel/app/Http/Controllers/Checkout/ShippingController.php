@@ -10,12 +10,14 @@ class ShippingController extends \App\Http\Controllers\Controller
 {
     public function saveShippingAddress($cartToken, Request $request)
     {
+        // @todo: populate $data['region_id'] with one from directory_country_regions
         $data = $request->all();
         $checkoutAddress = CheckoutAddress::createOrUpdateAddress($data, CheckoutAddress::ADDRESS_TYPE_SHIPPING);
 
         $cart = $checkoutAddress->cart;
         // For populating cart JSON property "cartItems"...
         $items = $cart->cartItems;
+
         if ($checkoutAddress->id) {
             // dispatch and return $checkoutAddress
             dispatch(new \App\Jobs\EstimateShippingMethodsJob(
@@ -85,11 +87,16 @@ class ShippingController extends \App\Http\Controllers\Controller
                     $cart = $checkoutAddress->cart;
                     $cart->updateTotalsBasedOnMagento($response['totals']);
                     $cart->save();
+                    // reformat total_segments for proper display
+                    $cart->total_segments = $cart->getTotalSegments();
+                    $cart->cartItems;
+
                     // Update totals of shipping address also
                     $checkoutAddress->updateTotalsBasedOnMagento($response['totals']);
                     $checkoutAddress->save();
 
                     return response()->json([
+                        'cart' => $cart,
                         'payment_methods' => $response['payment_methods'],
                         'totals' => $response['totals'],
                     ]);

@@ -41,12 +41,14 @@
       'stepToShow',
       'setStepToShow',
       'cart',
+      'setCart',
       'addresses',
       'shippingMethods',
       'setPaymentMethods',
       'ajaxInProgress',
       'setAjaxInProgress'
     ],
+    props: ['stepId', 'showFlag'],
     components: {
       ShippingMethod
     },
@@ -82,12 +84,15 @@
       },
       goToNextStep(e) {
         e.preventDefault();
+        // @todo: GET PAYMENT METHODS
+        // show payment method step
+        this.setStepToShow('payment-method');
       },
       getPaymentMethods(shippingMethod) {
         this.setAjaxInProgress(true);
 
         const saveShippingMethodUrl = '/checkout/shipping-method';
-        const address_id = this.addresses()[0].id;
+        const address_id = this.addresses().shipping.id;
         const shipping_method = shippingMethod.method;
         const shipping_carrier_code = shippingMethod.carrier;
         const shipping_description = shippingMethod.method_title;
@@ -98,7 +103,10 @@
           shipping_carrier_code
         };
         axios.post(saveShippingMethodUrl, payload).then(response => {
-          const { payment_methods, totals } = response.data;
+          const { cart, payment_methods, totals } = response.data;
+          if (cart != undefined) {
+            this.setCart(cart);
+          }
           this.setPaymentMethods(payment_methods);
         }).finally(() => { this.setAjaxInProgress(false) });
       }
@@ -106,18 +114,13 @@
     computed: {
       contentClass() {
         let contentClass = 'shipping-method step-content hidden';
-        if (this.stepToShow() == this.stepId) {
-          this.arrowClicked = true;
-          this.setStepToShow('');
-        }
 
-        if (this.arrowClicked) {
+        if (this.showFlag) {
           contentClass = 'shipping-method step-content';
         }
         return contentClass;
 
       }
-
     }
   }
 </script>

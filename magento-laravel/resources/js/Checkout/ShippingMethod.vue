@@ -9,6 +9,7 @@
 
   const { formatPrice } = NumberFormat;
   export default {
+    inject: ['cart'],
     props: {
       // Following are properties passed from ShippingMethodStep.vue
       // shippingMethod -  subject shipping method to be rendered
