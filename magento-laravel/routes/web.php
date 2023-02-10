@@ -72,3 +72,13 @@ Route::post('/checkout/shipping-method', [
     \App\Http\Controllers\Checkout\ShippingController::class,
     'saveShippingMethod'
 ])->name('checkout.save_shipping_method');
+
+Route::post('/checkout/{cartToken}/order', [
+    App\Http\Controllers\CheckoutController::class,
+    'placeOrder'
+])->name('place.order');
+
+Route::get('/checkout/success', [
+    \App\Http\Controllers\CheckoutController::class,
+    'success'
+])->name('checkout.success');
