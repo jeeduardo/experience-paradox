@@ -32,6 +32,7 @@ class Cart extends Model
     ];
 
     /**
+     * Update cart data
      * @param null $data
      * @return $this
      */

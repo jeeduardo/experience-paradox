@@ -52,6 +52,11 @@ class CartItem extends Model
         'is_failed'
     ];
 
+    /**
+     * Update cart item data
+     * @param $json
+     * @return $this
+     */
     public function updateCartItem($json)
     {
         $this->magento_quote_item_id = $json['item_id'];
@@ -59,6 +64,13 @@ class CartItem extends Model
         return $this;
     }
 
+    /**
+     * Determine what to put in failure_code column
+     * based on the add-to-cart API response we got from Magento
+     *
+     * @param $exception
+     * @return $this
+     */
     public function determineFailureCode($exception)
     {
         $message = strtolower($exception->getMessage());

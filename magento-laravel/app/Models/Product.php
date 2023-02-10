@@ -21,6 +21,12 @@ class Product extends Model
         'media_gallery_entries'
     ];
 
+    /**
+     * Retrieve products according to specified $categoryId
+     *
+     * @param $categoryId
+     * @return mixed
+     */
     public static function getProductsByCategory($categoryId)
     {
         $visibility = 4;
@@ -34,6 +40,8 @@ class Product extends Model
     }
 
     /**
+     * Retrieve products indexed by the product ID from Magento
+     * 
      * @return array
      */
     public static function getProductsIndexedByMagentoProductId()

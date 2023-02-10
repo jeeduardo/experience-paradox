@@ -24,6 +24,14 @@ class Category extends Model
         'custom_attributes'
     ];
 
+    /**
+     * Retrieve category data by url_path provided (e.g. the "gear/bags" in http://website/catalog/gear/bags)
+     * Trigger a 404 if category was not found
+     *
+     * @param $urlPath
+     * @return mixed
+     * @throws ModelNotFoundException
+     */
     public static function getByUrlPathOrFail($urlPath)
     {
         $category = self::where('url_path', $urlPath)->first();
@@ -33,6 +41,11 @@ class Category extends Model
         return $category;
     }
 
+    /**
+     * Get categories keyed by the Magento category ID
+     *
+     * @return array
+     */
     public static function getCategoriesByMagentoCategoryId()
     {
         $rows = self::all();
@@ -45,6 +58,12 @@ class Category extends Model
         return $categories;
     }
 
+    /**
+     * Get categories according to level specified
+     *
+     * @param $level
+     * @return array
+     */
     public static function getCategoriesByLevel($level)
     {
         $rows = self::where('level', $level)->get()->all();
@@ -55,6 +74,11 @@ class Category extends Model
         return $categories;
     }
 
+    /**
+     * Build and return category menu tree for Menu Display
+     *
+     * @return array
+     */
     public static function getCategoryMenuTree()
     {
         // get level 2 and 3
