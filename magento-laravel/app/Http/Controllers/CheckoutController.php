@@ -19,11 +19,22 @@ class CheckoutController extends Controller
 {
     public function checkout()
     {
+        /** @var \App\Models\Cart $cart */
         $cart = Cart::where('magento_quote_id', Cookie::get('quote_id'))->first();
 
-        $redirectPath = '/catalog/1';
+        $redirectPath = '/catalog/gear';
         if (!$cart) {
             return redirect()->to($redirectPath)->with('error', 'Your cart is empty. Cannot checkout.');
+        }
+
+        // If we found an erring cart item, return with error message.
+        $hasErringCartItem = $cart->hasErringCartItem();
+        if ($hasErringCartItem instanceof \App\Models\CartItem) {
+            $message = $hasErringCartItem->getErrorMessageForItem();
+
+            return redirect()
+                ->to($redirectPath)
+                ->with('error', 'Cannot checkout'.$message);
         }
 
         $categoryMenus = Category::getCategoryMenuTree();

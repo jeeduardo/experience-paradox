@@ -71,11 +71,46 @@ class CartItem extends Model
         return $this;
     }
 
+    /**
+     * Get the specific error message for a cart item depending on failure_code
+     *
+     * @return string
+     */
+    public function getErrorMessageForItem()
+    {
+        $message = '';
+
+        $errorMessages = [
+            self::FAILURE_CODE_OOS => 'is out of stock :(',
+            self::FAILURE_CODE_ERROR => 'has an error. Please contact administrator.',
+            self::FAILURE_CODE_DISABLED => 'is now disabled. :('
+        ];
+
+        if (isset($errorMessages[$this->failure_code])) {
+            $message = ': '.$this->name.' '.$errorMessages[$this->failure_code];
+        }
+
+        return $message;
+    }
+
+    /**
+     * Get parent cart of the subject cart item
+     * Accessed by $cartItem->cart NOT $cartItem->cart()
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function cart()
     {
         return $this->belongsTo(Cart::class);
     }
 
+    /**
+     * Add a cart item data to the cart_items table
+     *
+     * @param $cart
+     * @param $request
+     * @param $quoteId
+     * @return bool
+     */
     public static function createCartItemData($cart, $request, $quoteId)
     {
         $cartItemData = self::parseCartItemData($cart, $request, $quoteId);
@@ -84,6 +119,14 @@ class CartItem extends Model
         return (!empty($cartItem->id)) ? $cartItem : false;
     }
 
+    /**
+     * Return an array of cart item data to be inserted/updated
+     *
+     * @param $cart
+     * @param $request
+     * @param $quoteId
+     * @return array
+     */
     private static function parseCartItemData($cart, $request, $quoteId)
     {
         $paramCartItem = $request->post('cartItem');

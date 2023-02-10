@@ -31,6 +31,10 @@ class Cart extends Model
         'is_active'
     ];
 
+    /**
+     * @param null $data
+     * @return $this
+     */
     public function updateCart($data = null)
     {
         $cartItems = $this->cartItems;
@@ -52,6 +56,11 @@ class Cart extends Model
         return $this;
     }
 
+    /**
+     * Update the cart totals based on Magento's calculation
+     * @param $totals
+     * @return $this
+     */
     public function updateTotalsBasedOnMagento($totals)
     {
         $this->grand_total = $totals['grand_total'];
@@ -66,6 +75,10 @@ class Cart extends Model
         return $this;
     }
 
+    /**
+     * Get those total segments that the customer will see at checkout/cart page
+     * @return array|mixed
+     */
     public function getTotalSegments()
     {
         $totalSegments = \json_decode($this->total_segments, true);
@@ -75,9 +88,31 @@ class Cart extends Model
         return [];
     }
 
+    /**
+     * Accessor method for the cart's items
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * Look for any erring cart items, return that item if found
+     * @return bool|\App\Models\CartItem
+     */
+    public function hasErringCartItem()
+    {
+        $items = $this->cartItems;
+
+        // Return cart item if something is not valid.
+        foreach ($items as $cartItem) {
+            if ($cartItem->has_failed) {
+                return $cartItem;
+            }
+        }
+
+        return false;
     }
 
 }
