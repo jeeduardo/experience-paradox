@@ -6,17 +6,22 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 
 class CategoryController extends Controller
 {
+
+    public function invalidCategory()
+    {
+        throw (new ModelNotFoundException)->setModel(Category::class, '');
+    }
+
     public function view($urlPath, Request $request)
     {
-        // @todo: $urlPath is a category_id as of now , 02-02-2023
-        // @todo: we will find by url_path eventually
-        $category = Category::getByUrlPath($urlPath);
+        $category = Category::getByUrlPathOrFail($urlPath);
         $products = Product::getProductsByCategory($category->id);
 
         $categoryMenus = Category::getCategoryMenuTree();

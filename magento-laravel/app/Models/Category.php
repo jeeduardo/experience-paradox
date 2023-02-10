@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Category extends Model
 {
@@ -23,10 +24,12 @@ class Category extends Model
         'custom_attributes'
     ];
 
-    public static function getByUrlPath($urlPath)
+    public static function getByUrlPathOrFail($urlPath)
     {
-        // @todo: change to "WHERE url_path = <url_path>" later...
         $category = self::where('url_path', $urlPath)->first();
+        if (is_null($category)) {
+            throw (new ModelNotFoundException)->setModel(self::class, $urlPath);
+        }
         return $category;
     }
 
