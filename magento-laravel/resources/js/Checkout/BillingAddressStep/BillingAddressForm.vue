@@ -1,7 +1,6 @@
 <template>
   <form action="" method="POST">
 
-
     <div className="row">
       <label htmlFor="firstname" className="hidden">First name</label>
       <div className="form-input-container">
@@ -11,6 +10,9 @@
                id="firstname"
                v-model="billingAddressFormData.firstname"
                placeholder="First name" />
+      </div>
+      <div className="error-msg" v-if="errors.firstname">
+        <span>{{ errors.firstname }}</span>
       </div>
     </div>
 
@@ -24,6 +26,9 @@
                v-model="billingAddressFormData.lastname"
                placeholder="Last name" />
       </div>
+      <div className="error-msg" v-if="errors.lastname">
+        <span>{{ errors.lastname }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -35,6 +40,9 @@
                id="street"
                v-model="billingAddressFormData.street"
                placeholder="Street" />
+      </div>
+      <div className="error-msg" v-if="errors.street">
+        <span>{{ errors.street }}</span>
       </div>
     </div>
 
@@ -48,6 +56,9 @@
                v-model="billingAddressFormData.city"
                placeholder="City" />
       </div>
+      <div className="error-msg" v-if="errors.city">
+        <span>{{ errors.city }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -59,6 +70,9 @@
                id="postcode"
                v-model="billingAddressFormData.postcode"
                placeholder="Postal Code" />
+      </div>
+      <div className="error-msg" v-if="errors.postcode">
+        <span>{{ errors.postcode }}</span>
       </div>
     </div>
 
@@ -72,6 +86,9 @@
                v-model="billingAddressFormData.region"
                placeholder="State/Province" />
       </div>
+      <div className="error-msg" v-if="errors.region">
+        <span>{{ errors.region }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -83,62 +100,68 @@
           <option value="PH">Philippines</option>
         </select>
       </div>
+      <div className="error-msg" v-if="errors.country_id">
+        <span>{{ errors.country_id }}</span>
+      </div>
     </div>
 
     <div className="row">
       <label htmlFor="telephone" className="hidden">Phone Number</label>
       <div className="form-input-container" style="margin-bottom: 10px;">
         <input type="text"
-               className="form-input"
-               name="telephone"
-               id="telephone"
-               v-model="billingAddressFormData.telephone"
-               placeholder="Phone Number" />
+                className="form-input"
+                name="telephone"
+                id="telephone"
+                v-model="billingAddressFormData.telephone"
+                placeholder="Phone Number" />
+      </div>
+      <div className="error-msg" v-if="errors.telephone">
+        <span>{{ errors.telephone }}</span>
       </div>
     </div>
 
     <div className="row">
-      <button className="btn btn-primary" @click="saveAddress">Save Address</button>
+      <button :class="getSubmitClass()" @click="saveAddress">Save Address</button>
     </div>
 
-  </form>
+    </form>
 </template>
 <script>
-  export default {
+    let billingAddressFormData = {};
+    export default {
 
-    inject: [
-      'cart',
-      'addresses',
-      'setStepToShow',
-      'ajaxInProgress',
-      'setAjaxInProgress'
-    ],
-    data() {
-      console.log('BillingAddressForm.vue :: this.addresses()', this.addresses(), this.addresses().length);
-      let billingAddressFormData = {
-        firstname: '',
-        lastname: '',
-        street: '',
-        city: '',
-        postcode: '',
-        region: '',
-        country_id: '',
-        telephone: ''
-      };
+      inject: [
+        'cart',
+        'addresses',
+        'setStepToShow',
+        'ajaxInProgress',
+        'setAjaxInProgress'
+      ],
+      data() {
+        console.log('BillingAddressForm.vue :: this.addresses()', this.addresses(), this.addresses().length);
+        billingAddressFormData = {
+          firstname: '',
+          lastname: '',
+          street: '',
+          city: '',
+          postcode: '',
+          region: '',
+          country_id: '',
+          telephone: ''
+        };
 
-      let address = {};
-      if (this.addresses().billing) {
-        address = this.addresses().billing;
-        // if (address.same_as_billing) {
-        //   billingAddressFormData = address;
-        // } else if (this.addresses().length > 1) {
-        //   billingAddressFormData = this.addresses()[1];
-        // }
-        billingAddressFormData = this.addresses().billing;
-      }
+        let address = {};
+        if (this.addresses().billing) {
+          address = this.addresses().billing;
+          billingAddressFormData = this.addresses().billing;
+        }
 
+      let errors = {};
+      let isFormTouched = false;
       return {
-        billingAddressFormData
+        billingAddressFormData,
+        errors,
+        isFormTouched
       };
     },
     methods: {
@@ -186,6 +209,64 @@
           this.arrowClicked = false;
           this.setAjaxInProgress(false);
         });
+      },
+      getSubmitClass() {
+        console.log('BillingAddressForm.vue :: getSubmitClass :: ', Object.keys(this.errors));
+        if (!Object.keys(this.errors).length && this.isFormTouched) {
+          return 'btn btn-primary';
+        }
+        return 'btn btn-primary btn-disabled';
+      }
+    },
+    watch: {
+      billingAddressFormData: {
+        handler(value) {
+          this.isFormTouched = true;
+          console.log('watch billingAddressFormData', value);
+
+          this.errors = {};
+          const validateEmpty = () => {
+            const requiredFields = {
+              'firstname': 'First name',
+              'street': 'street',
+              'city': 'city',
+              'postcode': 'postal code',
+              'telephone': 'phone number',
+              'region': 'State',
+              'country_id': 'Country'
+            };
+            let errorMessage = 'Please enter your ';
+            for (let f in requiredFields) {
+              if (!value[f]) {
+                this.errors[f] = errorMessage + requiredFields[f];
+              }
+            }
+          };
+
+          const validateFormats = () => {
+            const emailPattern = new RegExp(/@[a-z]+.com/g);
+            if (value.email 
+              && value.email.match(emailPattern) == undefined) {
+              this.errors['email'] = 'Not a valid email address';
+            }
+
+            const postcodePattern = new RegExp(/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/g);
+            if (value.postcode 
+              && value.postcode.match(postcodePattern) == undefined) {
+              this.errors['postcode'] = 'Postal code format is not valid.';
+            }
+
+            const telephonePattern = new RegExp(/[0-9]{10}/g);
+            if (value.telephone 
+              && value.telephone.match(telephonePattern) == undefined) {
+              this.errors['telephone'] = 'Not a valid phone number';
+            }
+          }
+
+          validateEmpty();
+          validateFormats();
+        },
+        deep: true
       }
     }
   }

@@ -10,7 +10,6 @@
 
     <div :class="contentClass" role="content" style="position: relative;">
       <ul>
-        <li>Shipping methods here</li>
         <li v-for="(shippingMethod, index) in shippingMethods()"
             :shippingmethod="shippingMethod.code">
           <ShippingMethod

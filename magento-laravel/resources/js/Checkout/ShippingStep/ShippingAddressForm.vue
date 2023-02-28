@@ -1,5 +1,6 @@
 <template>
   <form action="" method="POST">
+
     <div className="row">
       <label htmlFor="email" className="required hidden">
         Email
@@ -9,6 +10,9 @@
                className="form-input"
                name="email" v-model="shippingAddressFormData.email"
                placeholder="Email address"/>
+      </div>
+      <div className="error-msg" v-if="errors.email">
+        <span>{{ errors.email }}</span>
       </div>
     </div>
 
@@ -21,6 +25,9 @@
                id="firstname"
                v-model="shippingAddressFormData.firstname"
                placeholder="First name" />
+      </div>
+      <div className="error-msg" v-if="errors.firstname">
+        <span>{{ errors.firstname }}</span>
       </div>
     </div>
 
@@ -46,6 +53,9 @@
                v-model="shippingAddressFormData.street"
                placeholder="Street" />
       </div>
+      <div className="error-msg" v-if="errors.street">
+        <span>{{ errors.street }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -57,6 +67,9 @@
                id="city"
                v-model="shippingAddressFormData.city"
                placeholder="City" />
+        <div className="error-msg" v-if="errors.city">
+          <span>{{ errors.city }}</span>
+        </div>
       </div>
     </div>
 
@@ -70,6 +83,9 @@
                v-model="shippingAddressFormData.postcode"
                placeholder="Postal Code" />
       </div>
+      <div className="error-msg" v-if="errors.postcode">
+        <span>{{ errors.postcode }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -81,6 +97,9 @@
                id="region"
                v-model="shippingAddressFormData.region"
                placeholder="State/Province" />
+      </div>
+      <div className="error-msg" v-if="errors.region">
+        <span>{{ errors.region }}</span>
       </div>
     </div>
 
@@ -103,6 +122,9 @@
           <option value="PH">Philippines</option>
         </select>
       </div>
+      <div className="error-msg" v-if="errors.country_id">
+        <span>{{ errors.country_id }}</span>
+      </div>
     </div>
 
     <div className="row">
@@ -114,6 +136,9 @@
                id="telephone"
                v-model="shippingAddressFormData.telephone"
                placeholder="Phone Number" />
+      </div>
+      <div className="error-msg" v-if="errors.telephone">
+        <span>{{ errors.telephone }}</span>
       </div>
     </div>
 
@@ -129,7 +154,7 @@
     </div>
 
     <div className="row">
-      <button className="btn btn-primary" @click="saveAddress">Save Address</button>
+      <button :class="getSubmitClass()" @click="saveAddress" :disabled="isSubmitDisabled">Save Address</button>
     </div>
   </form>
 
@@ -147,6 +172,7 @@
       'cart',
       'regions',
       'addresses',
+      'setShippingAddress',
       'setShippingMethods',
       'setStepToShow',
       'ajaxInProgress',
@@ -182,6 +208,10 @@
         sameAsBilling = true;
       }
 
+      let errors = {};
+      // flag to check if address form was "touched" already
+      let isFormTouched = false;
+
       shippingAddressFormData = {
         id,
         email,
@@ -197,10 +227,7 @@
         same_as_billing: sameAsBilling
       };
 
-      return {
-        shippingAddressFormData,
-        sameAsBilling
-      }
+      return { shippingAddressFormData, sameAsBilling, errors, isFormTouched };
     },
     methods: {
       syncWithRegionTextbox(e) {
@@ -223,6 +250,7 @@
       },
       saveAddress(e) {
         e.preventDefault();
+
         const {
           region,
           region_id,
@@ -268,13 +296,18 @@
         axios.post(shippingMethodsUrl, shippingMethodsPayload).then(response => {
           shippingAddressFormData = response.data.checkout_address;
           this.shippingAddressFormData = shippingAddressFormData;
+          this.setShippingAddress(shippingAddressFormData);
 
           var pollShippingMethodsFn = setInterval(() => {
             let addressId = shippingAddressFormData.id;
 
             const pollShippingMethodsUrl = '/checkout/address/' + addressId + '/shipping-methods';
             axios.get(pollShippingMethodsUrl).then(pollResponse => {
-              if (pollResponse.data && pollResponse.data.shippingMethods) {
+              if (
+                pollResponse.data
+                && pollResponse.data.shippingMethods
+                && pollResponse.data.shippingMethods.length > 0
+              ) {
                 this.setShippingMethods(pollResponse.data.shippingMethods);
                 this.$emit('afterSaveShippingAddress');
 
@@ -307,9 +340,71 @@
           return 'same-as-billing-radio active';
         }
         return 'same-as-billing-radio';
+      },
+      getSubmitClass() {
+        if (!Object.keys(this.errors).length && this.isFormTouched) {
+          return 'btn btn-primary';
+        }
+        return 'btn btn-primary btn-disabled';
+      }
+    },
+    computed: {
+      isSubmitDisabled() {
+        console.log('isSubmitDisabled', !Object.keys(this.errors).length);
+        if (!Object.keys(this.errors).length && this.isFormTouched) {
+          return false;
+        }
+        return true
       }
     },
     watch: {
+      shippingAddressFormData: {
+        handler(value) {
+          this.isFormTouched = true;
+          this.errors = {};
+
+          const validateEmpty = () => {
+            const requiredFields = {
+              'email': 'e-mail address',
+              'firstname': 'First name',
+              'street': 'street',
+              'city': 'city',
+              'postcode': 'postal code',
+              'telephone': 'phone number'
+            };
+            let errorMessage = 'Please enter your ';
+            for (let f in requiredFields) {
+              if (!value[f]) {
+                this.errors[f] = errorMessage + requiredFields[f];
+              }
+            }
+          };
+
+          const validateFormats = () => {
+            const emailPattern = new RegExp(/@[a-z]+.(com|ca)/g);
+            if (value.email 
+              && value.email.match(emailPattern) == undefined) {
+              this.errors['email'] = 'Not a valid email address';
+            }
+
+            const postcodePattern = new RegExp(/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/g);
+            if (value.postcode 
+              && value.postcode.match(postcodePattern) == undefined) {
+              this.errors['postcode'] = 'Postal code format is not valid.';
+            }
+
+            const telephonePattern = new RegExp(/[0-9]{10}/g);
+            if (value.telephone 
+              && value.telephone.match(telephonePattern) == undefined) {
+              this.errors['telephone'] = 'Not a valid phone number';
+            }
+          }
+          validateEmpty();
+          validateFormats();
+
+        },
+        deep: true
+      }
     }
   }
 </script>

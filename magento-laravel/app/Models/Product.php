@@ -41,7 +41,7 @@ class Product extends Model
 
     /**
      * Retrieve products indexed by the product ID from Magento
-     * 
+     *
      * @return array
      */
     public static function getProductsIndexedByMagentoProductId()

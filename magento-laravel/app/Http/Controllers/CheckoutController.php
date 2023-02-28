@@ -94,16 +94,22 @@ class CheckoutController extends Controller
 
         // Save record to order table
         $orderData = Order::prepareOrderData($result['json']);
+        
         /** @var \App\Models\Order $order */
         $order = Order::create($orderData);
         // Return immediately if there's no order ID
         if (empty($order->id)) {
             return response()->json($json);
         }
+        // while top-level order data is saved, let's save the order_items data in the background
+        $cartId = Cookie::get('cart-main-id');
+        $cart = Cart::findOrFail($cartId);
+        dispatch(new \App\Jobs\AddOrderItemsJob($order, $result['json'], $cart));
 
         $json['order_id'] = $result['json']['entity_id'];
         $json['increment_id'] = $result['json']['increment_id'];
-        Cookie::queue('order_id', $json['increment_id']);
+        // Cookie::queue('order_id', $json['increment_id']);
+        session(['order_id' => $order->id]);
 
         $response = $result['json'];
         // Get results, store to cart_to_order_api
@@ -123,21 +129,23 @@ class CheckoutController extends Controller
 
     public function success()
     {
-        $cartId = Cookie::get('cart-main-id');
-        $cart = Cart::findOrFail($cartId);
         /** @var \App\Models\Order $order */
-        $order = Order::findOrFail($cart->order_id);
+        $orderId = session('order_id');
+        if (empty($orderId)) {
+            return redirect()->to('/catalog/gear')->with('error', 'Missing order ID.');
+        }
 
+        $order = Order::findOrFail($orderId);
         $data = [
-            'vars' => [],
-            'order' => $order,
-            // while increment_id is not yet in our DB
-            'orderIncrementId' => $order->increment_id,
-            'fullname' => $order->getFullName(),
+            'vars' => [
+                'categoryMenus' => Category::getCategoryMenuTree(),
+                'order' => $order,
+                'fullname' => $order->getFullName(),
+            ],
         ];
 
-        // Remove cookies... update carts table, etc...
-        Cookie::expire('order_id');
+        // Remove cookies... 
+        // @todo: update carts table, etc...
         Cookie::expire('quote_id');
         Cookie::expire('cart-id');
         Cookie::expire('cart-main-id');

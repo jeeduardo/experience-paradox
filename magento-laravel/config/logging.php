@@ -53,7 +53,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single', 'product_sync', 'cart_sync'],
+            'channels' => ['single', 'product_sync', 'cart_sync', 'order_sync'],
             'ignore_exceptions' => false,
         ],
 
@@ -126,6 +126,11 @@ return [
             'driver' => 'single',
             'level' => 'debug',
             'path' => storage_path('logs/cart_sync.log'),
+        ],
+        'order_sync' => [
+            'driver' => 'single',
+            'level' => 'debug',
+            'path' => storage_path('logs/order_sync.log'),
         ],
     ],
 

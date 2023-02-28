@@ -15,7 +15,7 @@
           </a>
         </div>
 
-        <div class="right-links header-item">
+        <div class="right-links header-item" v-if="!isCheckout() && isNotCheckoutSuccess">
           <div class="minicart">
             <a href="#" class="cart-link" @click="toggleShowMiniCart">
               <span class="cart-total-qty">{{ formatInt(cart.items_qty) }}</span>
@@ -31,10 +31,8 @@
 
         <Menus :categoryMenus="categoryMenus" />
 
-        <div class="cart-content">
-          <div id="mini-cart-app">
-            <MiniCart @removeFromCart="removeFromCart" />
-          </div>
+        <div class="cart-content" v-if="!isCheckout() && isNotCheckoutSuccess">
+          <MiniCart @removeFromCart="removeFromCart" />
         </div>
     </div>
   </header>
@@ -46,12 +44,16 @@
     </div>
   </div>
 
-  <div id="catalog-container" v-if="getPathname() != '/checkout'">
+  <div id="catalog-container" v-if="!isCheckout() && isNotCheckoutSuccess">
     <CategoryView />
   </div>
 
   <div id="checkout-container" v-if="isCheckout()">
     <Checkout :cart="cart" :addresses="addresses" />
+  </div>
+
+  <div id="checkout-container" v-if="!isNotCheckoutSuccess">
+    <CheckoutSuccess :order="order" :fullname="fullname" />
   </div>
 
 </template>
@@ -64,19 +66,23 @@
   import CategoryView from './CategoryView.vue';
   // Vue JS for the checkout page
   import Checkout from './Checkout.vue';
+  // Vue JS for the checkout success page
+  import CheckoutSuccess from './Checkout/Success.vue';
 
   // Fetch the [data-vars] value from the div with id app (div#app)
   const { vars } = document.getElementById('app').dataset;
   // Parse the variables to JSON then get necessary objects (menus, cart, etc..)
-  const { categoryMenus, cart, errorMessages, addresses, shippingMethods, regions } = JSON.parse(vars);
+  const { categoryMenus, cart, errorMessages, addresses, shippingMethods, regions, order, fullname } = JSON.parse(vars);
 
   export default {
     components: {
-      Menus,
-      MiniCart,
-      CategoryView,
-      Checkout
-    },
+    Menus,
+    MiniCart,
+    CategoryView,
+    Checkout,
+    CheckoutSuccess,
+    MiniCart
+},
     provide() {
       // The following will be made accessible to child components (of the children of App.vue, and so forth..)
       // (e.g. the ShippingAddressForm.vue will be able to access the "cart" object
@@ -117,6 +123,8 @@
         regions: () => this.regions,
         // function to return address/es linked to active cart session used
         addresses: () => this.addresses,
+        // set shipping address
+        setShippingAddress: (shippingAddress) => { this.addresses.shipping = shippingAddress; },
         // @TODO: TRICKY scenario with billing address depending on same_as_billing flag...
         // function to return the shipping method/s available for given
         shippingMethods: () => this.shippingMethods,
@@ -139,17 +147,27 @@
       let showBurgerMenu = false;
       let ajaxInProgress = false;
       let showMiniCart = false;
-      const axios = window.axios;
       let stepToShow = '';
-      // const categoryMenus = categoryMenus;
 
       let itemsQty = 0;
+
+      let isNotCheckoutSuccess = true;
+      // Checkout success
+      if (window.location.pathname == '/checkout/success') {
+        isNotCheckoutSuccess = false;
+        return {
+          isNotCheckoutSuccess,
+          categoryMenus,
+          order,
+          fullname
+        };
+      }
+
       if (cart.items_qty != undefined) {
         itemsQty = cart.items_qty;
       }
       let paymentMethods = [];
-
-
+      const axios = window.axios;
 
       const stepIds = {
         'cart-summary': 'cart-summary',
@@ -169,6 +187,7 @@
 
       return {
         errorMessages,
+        isNotCheckoutSuccess,
         ajaxInProgress,
         stepIds,
         showFlags,

@@ -35,12 +35,9 @@
             <button className="proceed-btn" @click="goToNextStep">Proceed</button>
           </div>
 
-
-
         </div>
 
       </div>
-
 
       <div :class="getSpinnerClass()">
         <div className="spinner">
@@ -69,7 +66,6 @@
       TotalSegment
     },
     data() {
-      // console.log('CartSummaryStep.vue :: cart?', this.cart());
       return {
         formatInt
       }

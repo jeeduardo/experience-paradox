@@ -39,10 +39,6 @@ export default {
     },
     getContentClass() {
       let contentClass = 'billing-address step-content hidden';
-      // if (this.stepToShow() == this.stepId) {
-      //   this.arrowClicked = true;
-      //   this.setStepToShow('');
-      // }
 
       if (this.showFlag) {
         contentClass = 'billing-address step-content';
