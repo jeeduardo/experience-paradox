@@ -12,7 +12,10 @@ BEGIN
         `month`,
         `day`,
         `date_today`,
-        `orders_total`
+        `order_amount_total`,
+        `orders_total`,
+        `created_at`,
+        `updated_at`
       )
     VALUES
       (
@@ -20,13 +23,18 @@ BEGIN
         lpad(month(current_date), 2, '0'),
         lpad(day(current_date), 2, '0'),
         current_date,
-        NEW.grand_total
+        NEW.grand_total,
+        1,
+        NOW(),
+        NOW()
       );
   ELSE
     UPDATE
       sales_today
     SET
-      sales_today.order_amount_total = sales_today.order_amount_total + NEW.grand_total
+      sales_today.order_amount_total = sales_today.order_amount_total + NEW.grand_total,
+      sales_today.orders_total = sales_today.orders_total + 1,
+      sales_today.updated_at = NOW()
     WHERE
       sales_today.year = year(current_date)
       AND sales_today.month = lpad(month(current_date), 2, '0')
