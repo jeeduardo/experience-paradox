@@ -73,12 +73,7 @@ class ShippingController extends \App\Http\Controllers\Controller
                 $checkoutAddress->save();
 
                 // @todo: get billing address
-                $response = $cartService->saveShippingMethod([
-                    'cart' => $checkoutAddress->cart,
-                    'shipping_address' => $checkoutAddress,
-                    'billing_address' => $checkoutAddress,
-                    'shipping_carrier_code' => $data['shipping_carrier_code'],
-                ]);
+                $response = $cartService->saveShippingMethod($checkoutAddress, $data['shipping_carrier_code']);
 
                 // @todo: Save payment methods available
                 if ($response) {

@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LoginActionController;
+use App\Http\Controllers\Admin\LoginController;
+use App\Http\Controllers\Admin\LogoutController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,9 +17,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Admin level routes
+Route::get('/', LoginController::class)->name('login');
+
+Route::get('/login', LoginController::class)->name('login');
+
+Route::post('/login', LoginActionController::class)->name('login.action');
+
+Route::get('/admin/logout', LogoutController::class)->name('admin.logout');
+
+Route::get('/admin/dashboard', DashboardController::class)->name('admin.dashboard')->middleware('admin');
+
+// Frontend routes...
+Route::get('/catalog', [
+    \App\Http\Controllers\CategoryController::class,
+    'invalidCategory'
+])->name('invalid.category');
 
 Route::get('/catalog/{urlPath?}', [
     \App\Http\Controllers\CategoryController::class,
@@ -78,7 +99,4 @@ Route::post('/checkout/{cartToken}/order', [
     'placeOrder'
 ])->name('place.order');
 
-Route::get('/checkout/success', [
-    \App\Http\Controllers\CheckoutController::class,
-    'success'
-])->name('checkout.success');
+Route::get('/checkout/success', \App\Http\Controllers\CheckoutSuccessController::class)->name('checkout.success');

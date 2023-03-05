@@ -136,4 +136,22 @@ class OrderItem extends Model
 
         return $data;
     }
+
+    public static function getBestsellers()
+    {
+        $bestsellers = [];
+
+        $limit = config('settings.reports.bestsellers_limit');
+        $results = self::selectRaw('sku, name, SUM(qty_ordered) AS sum_ordered')
+                    ->groupBy('sku', 'name')
+                    ->orderByDesc('sum_ordered')
+                    ->limit($limit)
+                    ->get();
+
+        foreach ($results as $row) {
+            $row->sum_ordered = (int)$row->sum_ordered;
+            $bestsellers[$row->sku] = $row;
+        }
+        return $bestsellers;
+    }
 }

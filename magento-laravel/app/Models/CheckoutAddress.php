@@ -79,6 +79,22 @@ class CheckoutAddress extends Model
 
     public static function createOrUpdateAddress($data, $addressType)
     {
+        $addressData = self::parseAddressData($data, $addressType);
+
+        // Add or update checkout/shipping address data
+        if (empty($data['address']['id'])) {
+            $checkoutAddress = CheckoutAddress::create($addressData);
+        } else {
+            /** @var CheckoutAddress $checkoutAddress */
+            $checkoutAddress = CheckoutAddress::findOrFail($data['address']['id']);
+            $checkoutAddress->updateAddress($addressData);
+        }
+
+        return (!empty($checkoutAddress->id)) ? $checkoutAddress : false;
+    }
+
+    private static function parseAddressData($data, $addressType)
+    {
         $addressData = [
             'cart_id' => $data['cart_id'],
             'address_type' => $addressType,
@@ -87,7 +103,6 @@ class CheckoutAddress extends Model
             'lastname' => $data['address']['lastname'],
             'street' => $data['address']['street'][0],
             'region' => $data['address']['region'],
-//            'region_id' => $data['address']['region_id'],
             'city' => $data['address']['city'],
             'country_id' => $data['address']['country_id'],
             'telephone' => $data['address']['telephone'],
@@ -107,17 +122,8 @@ class CheckoutAddress extends Model
         if (!empty($data['address']['same_as_billing'])) {
             $addressData['same_as_billing'] = $data['address']['same_as_billing'];
         }
-
-        // Add or update checkout/shipping address data
-        if (empty($data['address']['id'])) {
-            $checkoutAddress = CheckoutAddress::create($addressData);
-        } else {
-            /** @var CheckoutAddress $checkoutAddress */
-            $checkoutAddress = CheckoutAddress::findOrFail($data['address']['id']);
-            $checkoutAddress->updateAddress($addressData);
-        }
-
-        return (!empty($checkoutAddress->id)) ? $checkoutAddress : false;
+        
+        return $addressData;
     }
 
     public function updateAddress($data)
@@ -195,6 +201,42 @@ class CheckoutAddress extends Model
         if (!empty($billingAddress->id)) {
             return $billingAddress;
         }
+        return false;
+    }
+
+    public static function validateAddresses($addresses)
+    {
+        $hasErrors = ['shipping' => false, 'billing' => false];
+        foreach ($addresses as $address) {
+            $noEmptyErrors = self::validateForEmpty($address);
+            if (!$noEmptyErrors) {
+                $hasErrors[$address->address_type] = true;
+            }
+        }
+        return $hasErrors;
+    }
+
+    private static function validateForEmpty($address)
+    {
+        $fields = [
+            'firstname',
+            'lastname',
+            'street',
+            'postcode',
+            'telephone',
+            'country_id'
+        ];
+
+        $erringFields = [];
+        foreach ($fields as $field) {
+            if (empty($address->$field)) {
+                $erringFields[] = $field;
+            }
+        }
+        if (empty($erringFields)) {
+            return true;
+        }
+
         return false;
     }
 

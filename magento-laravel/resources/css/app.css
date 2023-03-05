@@ -533,9 +533,18 @@ video {
   right: 0px;
 }
 
+.m-auto {
+  margin: auto;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .ml-1 {
@@ -572,6 +581,10 @@ video {
 
 .-mt-px {
   margin-top: -1px;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 
 .block {
@@ -622,6 +635,10 @@ video {
   width: 100%;
 }
 
+.w-11\/12 {
+  width: 91.666667%;
+}
+
 .max-w-6xl {
   max-width: 72rem;
 }
@@ -630,12 +647,20 @@ video {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .items-center {
   align-items: center;
 }
 
 .justify-center {
   justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .overflow-hidden {
@@ -698,8 +723,17 @@ video {
   padding-right: 1.5rem;
 }
 
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
 .pt-8 {
   padding-top: 2rem;
+}
+
+.text-left {
+  text-align: left;
 }
 
 .text-center {
@@ -722,6 +756,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.uppercase {
+  text-transform: uppercase;
 }
 
 .leading-7 {
@@ -1173,6 +1211,11 @@ video {
   font-weight: 700;
 }
 
+.btn-disabled {
+  color: #000;
+  background-color: #f5f5f5;
+}
+
 /* Checkout */
 
 #checkout-container .step-container {
@@ -1198,6 +1241,10 @@ video {
   right: 0;
   top: 4px;
   width: 70px;
+}
+
+#checkout-container .error-msg {
+  color: red;
 }
 
 #checkout-container .step {
@@ -1401,6 +1448,68 @@ video {
 #checkout-container .total-segment-price {
   width: 27%;
   text-align: right;
+}
+
+/* Admin-related CSS */
+
+.dashboard-content h1 {
+  font-size: 36px;
+  font-weight: 500;
+}
+
+.dashboard-content .report {
+  margin-top: 0.5rem;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.stats {
+  width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    width: 50%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.stats.level-2 {
+  width: 100%;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.stats .col-header {
+  margin-left: 0.5rem;
+  display: inline-block;
+  width: 33.333333%;
+  font-weight: 700;
+}
+
+.stats .col-header.half {
+  width: 48%;
+}
+
+.stats .col-data {
+  display: inline-block;
+  width: 60%;
+}
+
+.stats .col-data.half {
+  width: 48%;
+}
+
+.stats .h2-title {
+  font-weight: 400;
+  font-size: 24px;
 }
 
 @media (min-width: 768px) {

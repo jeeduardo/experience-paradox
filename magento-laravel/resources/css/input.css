@@ -313,6 +313,10 @@
     color: #fff;
     @apply rounded bg-blue-500 font-bold px-4 py-2;
 }
+.btn-disabled {
+    color: #000;
+    background-color: #f5f5f5;
+}
 
 /* Checkout */
 #checkout-container .step-container {
@@ -336,6 +340,9 @@
     right: 0;
     top: 4px;
     width: 70px;
+}
+#checkout-container .error-msg {
+    color: red;
 }
 #checkout-container .step {
     border-bottom: 1px solid #d8d8d8;
@@ -513,6 +520,37 @@
 #checkout-container .total-segment-price {
     width: 27%;
     text-align: right;
+}
+
+/* Admin-related CSS */
+.dashboard-content h1 {
+    font-size: 36px;
+    font-weight: 500;
+}
+.dashboard-content .report {
+    @apply flex flex-row flex-wrap w-full mt-2;
+}
+.stats {
+    @apply w-full px-2 py-2 md:w-1/2 md:px-4;
+}
+.stats.level-2 {
+    @apply w-full py-2;
+}
+.stats .col-header {
+    @apply w-1/3 font-bold inline-block ml-2;
+}
+.stats .col-header.half {
+    width: 48%;
+}
+.stats .col-data {
+    @apply w-3/5 inline-block;
+}
+.stats .col-data.half {
+    width: 48%;
+}
+.stats .h2-title {
+    font-weight: 400;
+    font-size: 24px;
 }
 
 @media (min-width: 768px) {

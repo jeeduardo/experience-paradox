@@ -45,6 +45,10 @@ class CheckoutController extends Controller
         $cartItems = $cart->cartItems;
 
         $addresses = CheckoutAddress::getAddresses($cart->id);
+        // @todo: validate the addresses!
+        $hasAddressValidationErrors = CheckoutAddress::validateAddresses($addresses);
+        $hasShippingAddressValidationError = $hasAddressValidationErrors['shipping'];
+        $hasBillingAddressValidationError = $hasAddressValidationErrors['billing'];
 
         $shippingMethods = [];
         // if ($shippingAddress->id) will have an error if it's a boolean/null
@@ -57,6 +61,8 @@ class CheckoutController extends Controller
                 'categoryMenus' => $categoryMenus,
                 'cart' => $cart,
                 'addresses' => $addresses,
+                'hasShippingAddressValidationError' => $hasShippingAddressValidationError,
+                'hasBillingAddressValidationError' => $hasBillingAddressValidationError,
                 'shippingMethods' => $shippingMethods,
                 'regions' => DirectoryCountryRegion::getRegions('CA'),
             ]
@@ -84,7 +90,7 @@ class CheckoutController extends Controller
         // json array for return response()->json...
         $json = ['status' => $result['status']];
 
-        if (!$result['successful']) {
+        if (empty($result['successful'])) {
             // Non 20x HTTP return status...
             $response = $result['body'];
             $order = false;
@@ -125,33 +131,5 @@ class CheckoutController extends Controller
         $cartToOrderApi = CartToOrderApi::create($cartToOrderApiData);
 
         return response()->json($json);
-    }
-
-    public function success()
-    {
-        /** @var \App\Models\Order $order */
-        $orderId = session('order_id');
-        if (empty($orderId)) {
-            return redirect()->to('/catalog/gear')->with('error', 'Missing order ID.');
-        }
-
-        $order = Order::findOrFail($orderId);
-        $data = [
-            'vars' => [
-                'categoryMenus' => Category::getCategoryMenuTree(),
-                'order' => $order,
-                'fullname' => $order->getFullName(),
-            ],
-        ];
-
-        // Remove cookies... 
-        // @todo: update carts table, etc...
-        Cookie::expire('quote_id');
-        Cookie::expire('cart-id');
-        Cookie::expire('cart-main-id');
-
-        // @todo: beautification of checkout success page...
-        return view('checkout.success', $data);
-
     }
 }

@@ -194,4 +194,24 @@ class Order extends Model
     {
         return $this->customer_firstname . ' ' . $this->customer_lastname;
     }
+
+    public static function getTopCustomers()
+    {
+        $topCustomers = [];
+
+        $limit = config('settings.reports.top_customers_limit');
+        $result = self::select('customer_firstname', 'customer_lastname')
+                    ->selectRaw('customer_email, COUNT(*) AS total_orders')
+                    ->whereNotNull('customer_email')
+                    ->groupBy('customer_email')
+                    ->orderByDesc('total_orders')
+                    ->orderByDesc('created_at')
+                    ->limit($limit)
+                    ->get();
+
+        foreach ($result as $row) {
+            $topCustomers[$row->customer_email] = $row;
+        }
+        return $topCustomers;
+    }
 }
