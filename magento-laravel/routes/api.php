@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\CategoryViewController;
+use App\Http\Controllers\Api\Customer\CartController;
+use App\Http\Controllers\Api\UserLoginController;
+use App\Http\Controllers\Api\UserRegistrationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +23,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:api')->get('categories/{id}', CategoryViewController::class)->name('category.view');
+
+Route::middleware('auth:api')->post('/users', UserRegistrationController::class)->name('user.add');
+
+Route::middleware('auth:api')->post('/login', UserLoginController::class)->name('user.login');
+
+Route::middleware('auth:api')->post('/carts', CartController::class)->name('registered.cart');

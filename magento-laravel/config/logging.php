@@ -132,6 +132,11 @@ return [
             'level' => 'debug',
             'path' => storage_path('logs/order_sync.log'),
         ],
+        'customers' => [
+            'driver' => 'single',
+            'level' => 'debug',
+            'path' => storage_path('logs/customers.log'),
+        ],
     ],
 
 ];
